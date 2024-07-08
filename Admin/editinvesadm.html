@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Investigacion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.0.7/css/boxicons.min.css">
+    <link rel="stylesheet" href="../static/styles.css" />
+</head>
+<body class="addp">
+
+    <header class="barra-sup"> 
+      <a href="Admin.html" id="Titulo" class="Titulo">EcoMapeoBotanico</a>
+      <button type="button" class="back"><a class="regre" href="editplanta.html?id=" id="backLink"><i class='bx bx-arrow-back'></i></a></button>
+      <button type="button" class="cerrar-sesion" onclick="cerrarSesion()"><i class='bx bx-log-out'></i></button>
+  </header>
+
+  <h1 class="tit-form">Formulario de Plantas</h1>
+    <form id="formEditarInvestigacion" class="formulario" action="editinvadm.php" method="POST" enctype="multipart/form-data" onsubmit="return confirmarinsertar(event);">
+        <label class="nombre" for="nombre">Nombre:</label><br>   
+        <input oninput="validarASCII(this)" readonly type="text" id="nombre" name="nombre" class="limitedcin" required><br><br>
+
+        <label for="nombre_cientifico">Nombre científico:</label><br>
+        <input oninput="validarASCII(this)" readonly type="text" id="nombre_cientifico" name="nombre_cientifico" class="limitedcin" required><br><br>
+
+        <label class="nombre" for="autor">Autor:</label><br>   
+        <input oninput="validarASCII(this)" type="text" id="autor" name="autor" class="limitedcin" required><br><br>
+
+        <label for="titulo">Título:</label><br>
+        <input oninput="validarASCII(this)" type="text" id="titulo" name="titulo" class="limitedcin" required><br><br>
+
+        <div class="sugerencia-container">
+            <label for="contenido">Descripción:<div class="sugerencia-btn">?</div></label><br>
+            <div class="sugerencia">Evitar usar caracteres especiales</div>
+        </div>
+        <textarea oninput="validarASCII(this)" rows="4" cols="50" id="contenido" name="contenido" class="limited" required></textarea><br><br>
+        
+        <button class="anterior" type="button" id="anterior">Anterior</button>
+        <button class="siguiente" type="button" id="siguiente">Siguiente</button>
+
+        <input type="hidden" name="id_planta" id="id_planta">
+        <input type="hidden" name="id_investigacion" id="id_investigacion">
+
+        <button class="enviar" type="submit" value="Enviar" onclick="return confirmarInsertar();">Enviar</button>
+    </form>
+ <script>
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  window.onload = function() {
+    var descripciones = document.querySelectorAll('textarea.limited');
+    
+    descripciones.forEach(function(textarea) {
+      var contador = document.createElement('span');
+      contador.textContent = '0';
+      textarea.parentNode.insertBefore(contador, textarea.nextSibling);
+
+      textarea.addEventListener('input', function() {
+        if (textarea.value.length > 1000) {
+          textarea.value = textarea.value.substring(0, 1000);
+        }
+        contador.textContent = textarea.value.length;
+      });
+    });
+  };
+
+
+    // Seleccionar todos los elementos con la clase 'limitedcin'
+    var elementos = document.querySelectorAll('.limitedcin');
+
+    // Iterar sobre cada elemento y aplicar la limitación de caracteres
+    elementos.forEach(function(elemento) {
+        elemento.addEventListener('input', function() {
+            // Limitar el texto a 50 caracteres
+            if (this.value.length > 50) {
+                this.value = this.value.substring(0, 50);
+            }
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtener el ID de la planta desde los parámetros de la URL
+    var urlParams = new URLSearchParams(window.location.search);
+    var idPlanta = urlParams.get('id');
+
+    // Verificar que el ID de la planta no esté vacío o sea inválido antes de proceder
+    if (idPlanta) {
+        // Construir la URL con el ID de la planta como parámetro
+        var url = "editplanta.html?id=" + idPlanta;
+
+        // Actualizar el atributo href del enlace de regreso dinámicamente
+        var backLink = document.getElementById('backLink');
+        backLink.setAttribute('href', url);
+    } else {
+        alert("No se encontró ID de planta válido en la URL.");
+    }
+});
+
+
+function confirmarInsertar() {
+    var confirmacion = confirm("¿Estás seguro de insertar esta investigación?");
+    return confirmacion;
+}
+function cerrarSesion() {
+    eliminarCookie('email');
+    window.location.href = "../LoginAdm/login.html";
+    window.history.replaceState({}, document.title, "../LoginAdm/login.html");
+}
+
+function eliminarCookie(nombre) {
+    document.cookie = nombre + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+function validarASCII(input) {
+    var regex = /^[ -~áéíóúÁÉÍÓÚüÜ,.ñÑ]*$/;
+    if (!regex.test(input.value)) {
+        input.value = input.value.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜ,.ñÑ'"\s]/g, '');
+    }
+}
+
+// Obtener los parámetros de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const idPlanta = urlParams.get('id');
+document.getElementById('id_planta').value = idPlanta;
+
+document.addEventListener('DOMContentLoaded', function() {
+    var investigaciones = [];
+    var index = 0;
+
+    function actualizarCampos() {
+        var investigacionActual = investigaciones[index];
+        document.getElementById("autor").value = investigacionActual.autor;
+        document.getElementById("titulo").value = investigacionActual.titulo;
+        document.getElementById("contenido").value = investigacionActual.contenido;
+        document.getElementById("id_investigacion").value = investigacionActual.ID_Inv;
+    }
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var respuesta = JSON.parse(this.responseText);
+            investigaciones = respuesta.investigaciones;
+            if (investigaciones.length > 0) {
+                actualizarCampos();
+            } else {
+                console.log('No se encontraron investigaciones asociadas a esta planta.');
+            }
+        }
+    };
+
+    xhttp.open("GET", "cargar_datos_edit.php?id=" + idPlanta, true);
+    xhttp.send();
+
+    document.getElementById("anterior").addEventListener("click", function() {
+        if (index > 0) {
+            index--;
+            actualizarCampos();
+        }
+    });
+
+    document.getElementById("siguiente").addEventListener("click", function() {
+        if (index < investigaciones.length - 1) {
+            index++;
+            actualizarCampos();
+        }
+    });
+
+    var xhttpPlanta = new XMLHttpRequest();
+    xhttpPlanta.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var datos = JSON.parse(this.responseText);
+            document.getElementById("nombre").value = datos.Nombrep;
+            document.getElementById("nombre_cientifico").value = datos.Nombre_cientifico;
+        }
+    };
+    xhttpPlanta.open("GET", "cargar_datos_inv.php?id=" + idPlanta, true);
+    xhttpPlanta.send();
+});
+</script>
+</body>
+</html>
+
+

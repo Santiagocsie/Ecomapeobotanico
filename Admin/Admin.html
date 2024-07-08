@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrador</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.0.7/css/boxicons.min.css">
+    <link rel="stylesheet" href="../static/styles.css" />
+</head>
+
+<body class="Adm">
+    <header class="barra-sup">
+        <a href="Admin.html" id="Titulo" class="Titulo">EcoMapeoBotánico</a>
+        <nav class="buscar">
+            <input type="text" class="busqueda" placeholder="Buscar...">
+        </nav>
+        <button type="button" class="cerrar-sesion" onclick="cerrarSesion()"><i class='bx bx-log-out'></i></button>
+    </header>
+    <main>
+        <ul class="plantaslist" id="plantasContainer">
+            <!-- Aquí se agregarán dinámicamente los elementos de la lista -->
+        </ul>
+        <script src="verificar_sesion.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // Obtenemos el campo de búsqueda
+                var campoBusqueda = document.querySelector('.busqueda');
+
+                // Evento de cambio en el campo de búsqueda
+                campoBusqueda.addEventListener('input', function () {
+                    var filtro = campoBusqueda.value.toLowerCase(); // Convertimos el texto de búsqueda a minúsculas
+
+                    // Seleccionamos todos los elementos de la lista de plantas
+                    var plantas = document.querySelectorAll('.plantaslist li');
+
+                    // Iteramos sobre los elementos de la lista de plantas
+                    plantas.forEach(function (planta) {
+                        var nombrePlanta = planta.textContent.toLowerCase(); // Convertimos el nombre de la planta a minúsculas
+
+                        // Si el nombre de la planta contiene el término de búsqueda, la mostramos, de lo contrario la ocultamos
+                        if (nombrePlanta.includes(filtro)) {
+                            planta.style.display = 'block';
+                        } else {
+                            planta.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+            function recargarPagina() {
+                // Recargar la página actual
+                location.reload();
+            }
+
+            window.onload = function () {
+                var xhttp = new XMLHttpRequest();
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        document.getElementById("plantasContainer").innerHTML = this.responseText;
+
+                        // Obtener todos los elementos de la lista de plantas
+                        var plantas = document.querySelectorAll('.planta');
+
+                        // Agregar evento de clic a cada elemento de la lista
+                        plantas.forEach(function (planta) {
+                            planta.addEventListener('click', function () {
+                                // Deseleccionar todas las plantas
+                                plantas.forEach(function (p) {
+                                    p.classList.remove('seleccionada');
+                                });
+
+                                // Seleccionar la planta clicada
+                                planta.classList.add('seleccionada');
+
+                                // Mostrar el ID de la planta seleccionada en la consola
+                                var idPlanta = planta.getAttribute('id');
+                                console.log('ID de la planta seleccionada:', idPlanta);
+                            });
+                        });
+
+                        // Habilitar el botón de edición de planta
+                        var editarPlanta = document.getElementById("editarPlanta");
+                        editarPlanta.addEventListener('click', function () {
+                            var plantaSeleccionada = document.querySelector('.planta.seleccionada');
+                            if (plantaSeleccionada) {
+                                // Obtener el ID de la planta seleccionada
+                                var idPlanta = plantaSeleccionada.getAttribute('id');
+
+                                // Construir la URL de la página de edición con el ID de la planta como parámetro
+                                var url = "editplanta.html?id=" + idPlanta;
+
+                                // Redirigir a la página de edición
+                                window.location.href = url;
+                            } else {
+                                alert("Seleccione una planta para editar.");
+                            }
+                        });
+                    }
+                };
+                xhttp.open("GET", "obtener_plantas.php", true);
+                xhttp.send();
+            };
+
+            document.addEventListener("DOMContentLoaded", function () {
+                document.getElementById("eliminarPlanta").addEventListener('click', function () {
+                    var plantaSeleccionada = document.querySelector('.planta.seleccionada');
+                    if (plantaSeleccionada) {
+                        var confirmar = confirm("¿Estás seguro de que deseas eliminar esta planta?");
+                        if (confirmar) {
+                            var idPlanta = plantaSeleccionada.getAttribute('id');
+                            var xhttp = new XMLHttpRequest();
+                            xhttp.onreadystatechange = function () {
+                                if (this.readyState == 4) {
+                                    if (this.status == 200) {
+                                        console.log('Respuesta del servidor:', this.responseText); // Imprimir la respuesta del servidor en la consola
+                                        try {
+                                            var response = JSON.parse(this.responseText);
+                                            if (response.success) {
+                                                alert("Planta eliminada correctamente.");
+                                                location.reload(); // Recargar la página
+                                            } else {
+                                                alert("Error al eliminar la planta: " + response.error);
+                                            }
+                                        } catch (error) {
+                                            console.error('Error al analizar la respuesta JSON:', error); // Manejar errores al analizar JSON
+                                        }
+                                    } else {
+                                        alert("Error en la solicitud al servidor. Código de estado: " + this.status);
+                                    }
+                                }
+                            };
+                            xhttp.open("GET", "eliminar_planta.php?id=" + idPlanta, true);
+                            xhttp.send();
+                        }
+                    } else {
+                        alert("Seleccione una planta para eliminar.");
+                    }
+                });
+            });
+
+            function cerrarSesion() {
+                eliminarCookie('admin_email');
+                window.location.href = "../LoginAdm/login.html";
+            }
+
+            function eliminarCookie(nombre) {
+                document.cookie = nombre + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            }
+        </script>
+    </main>
+
+    <footer class="barra-inf">
+        <button type="submit" class="Addplanta"><a href="addplanta.html"><i class='bx bxs-file-plus'></i></a></button>
+        <button type="submit" class="editar" id="editarPlanta"><a href="#" class="disabled"><i class='bx bxs-pencil'></i></a></button>
+        <button type="submit" class="eliminar" id="eliminarPlanta"><i class='bx bx-trash'></i></button>
+        <button type="submit" class="mapita"><a href="../Mapa"><i class='bx bx-map-alt'></i></a></button>
+    </footer>
+</body>
+
+</html>
+

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario Investigacion</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.0.7/css/boxicons.min.css">
+    <link rel="stylesheet" href="../static/styles.css" />
+</head>
+<body class="addp">
+
+    <header class="barra-sup"> 
+      <a href="investigador.html" id="Titulo" class="Titulo">EcoMapeo-inve</a>
+      <button type="button" class="back"><a class="regre" href="investigador.html"><i class='bx bx-arrow-back'></i></a></button>
+      <button type="button" class="cerrar-sesion" onclick="cerrarSesion()"><i class='bx bx-log-out'></i></button>
+  </header>
+
+  <h1 class="tit-form">Formulario de Plantas</h1>
+    <form id="formEditarInvestigacion" class="formulario" action="eliminv.php" method="POST" enctype="multipart/form-data" onsubmit="return confirmarinsertar(event);">
+        <label class="nombre" for="nombre">Nombre:</label><br>   
+        <input oninput="validarASCII(this)" readonly type="text" id="nombre" name="nombre" class="limitedcin" required><br><br>
+
+        <label for="nombre_cientifico">Nombre científico:</label><br>
+        <input oninput="validarASCII(this)" readonly type="text" id="nombre_cientifico" name="nombre_cientifico" class="limitedcin" required><br><br>
+
+        <label class="nombre" for="autor">Autor:</label><br>   
+        <input oninput="validarASCII(this)"  readonly type="text" id="autor" name="autor" class="limitedcin" required><br><br>
+
+        <label for="titulo">Título:</label><br>
+        <input oninput="validarASCII(this)" readonly type="text" id="titulo" name="titulo" class="limitedcin" required><br><br>
+
+        <div class="sugerencia-container">
+            <label for="contenido">Descripción:<div class="sugerencia-btn">?</div></label><br>
+            <div class="sugerencia">Evitar usar caracteres especiales</div>
+        </div>
+        <textarea oninput="validarASCII(this)" readonly rows="4" cols="50" id="contenido" name="contenido" class="limited" required></textarea><br><br>
+        
+        <button class="anterior" type="button" id="anterior">Anterior</button>
+        <button class="siguiente" type="button" id="siguiente">Siguiente</button>
+
+        <input type="hidden" name="id_planta" id="id_planta">
+        <input type="hidden" name="id_investigacion" id="id_investigacion">
+
+        <button class="enviar" type="submit" id="eliminar" onclick="return confirmarInsertar();">Eliminar</button>
+    </form>
+ <script>
+
+function confirmarInsertar() {
+    var confirmacion = confirm("¿Estás seguro de eliminar esta investigación?");
+    return confirmacion;
+}
+
+function cerrarSesion() {
+    eliminarCookie('email');
+    window.location.href = "../LoginAdm/login.html";
+    window.history.replaceState({}, document.title, "../LoginAdm/login.html");
+}
+
+function eliminarCookie(nombre) {
+    document.cookie = nombre + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+}
+
+function validarASCII(input) {
+    var regex = /^[ -~áéíóúÁÉÍÓÚüÜ,.ñÑ]*$/;
+    if (!regex.test(input.value)) {
+        input.value = input.value.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜ,.ñÑ'"\s]/g, '');
+    }
+}
+
+// Obtener los parámetros de la URL
+const urlParams = new URLSearchParams(window.location.search);
+const idPlanta = urlParams.get('id');
+document.getElementById('id_planta').value = idPlanta;
+
+document.addEventListener('DOMContentLoaded', function() {
+    var investigaciones = [];
+    var index = 0;
+
+    function actualizarCampos() {
+        var investigacionActual = investigaciones[index];
+        document.getElementById("autor").value = investigacionActual.autor;
+        document.getElementById("titulo").value = investigacionActual.titulo;
+        document.getElementById("contenido").value = investigacionActual.contenido;
+        document.getElementById("id_investigacion").value = investigacionActual.ID_Inv;
+    }
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var respuesta = JSON.parse(this.responseText);
+            investigaciones = respuesta.investigaciones;
+            if (investigaciones.length > 0) {
+                actualizarCampos();
+            } else {
+                console.log('No se encontraron investigaciones asociadas a esta planta.');
+            }
+        }
+    };
+
+    xhttp.open("GET", "cargar_datos_edit.php?id=" + idPlanta, true);
+    xhttp.send();
+
+    document.getElementById("anterior").addEventListener("click", function() {
+        if (index > 0) {
+            index--;
+            actualizarCampos();
+        }
+    });
+
+    document.getElementById("siguiente").addEventListener("click", function() {
+        if (index < investigaciones.length - 1) {
+            index++;
+            actualizarCampos();
+        }
+    });
+
+    var xhttpPlanta = new XMLHttpRequest();
+    xhttpPlanta.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var datos = JSON.parse(this.responseText);
+            document.getElementById("nombre").value = datos.Nombrep;
+            document.getElementById("nombre_cientifico").value = datos.Nombre_cientifico;
+        }
+    };
+    xhttpPlanta.open("GET", "cargar_datos_inv.php?id=" + idPlanta, true);
+    xhttpPlanta.send();
+
+    document.getElementById("eliminar").addEventListener("click", function() {
+        var confirmacion = confirm("¿Estás seguro de eliminar esta investigación?");
+        if (confirmacion) {
+            eliminarInvestigacion();
+        }
+    });
+});
+
+function eliminarInvestigacion() {
+    const idInvestigacion = document.getElementById('id_investigacion').value;
+    const idPlanta = document.getElementById('id_planta').value;
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var respuesta = JSON.parse(this.responseText);
+            if (respuesta.success) {
+                alert('Investigación eliminada exitosamente');
+                window.location.href = 'investigador.html';
+            } else {
+                alert('Error al eliminar la investigación: ' + respuesta.error);
+            }
+        }
+    };
+    xhttp.open("POST", "eliminv.php", true);
+    xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    xhttp.send("id_investigacion=" + idInvestigacion + "&id_planta=" + idPlanta);
+}
+</script>
+</body>
+</html>
+

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investigador</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.0.7/css/boxicons.min.css">
+</head>
+
+<body>
+<header> 
+        <a href="investigador.html" id="titulo" class="titulo">Eco-Investigador</a>
+        <nav class="buscar">
+            <input type="text" class="busqueda">
+            <button type="submit" class="search"><i class='bx bx-search'></i></button>
+            
+        </nav>
+        <button type="button" class="cerrar-sesion" onclick="cerrarSesion()"><i class='bx bx-log-out'></i></button>
+    </header>
+    <main>
+        <ul id="plantasContainer">
+            <!-- Aquí se agregarán dinámicamente los elementos de la lista -->
+        </ul>
+
+	<script src="verificar_sesion.js"></script>	
+        <script>
+                        function cerrarSesion() {
+        eliminarCookie('email');
+        // Redirige al usuario a la página de inicio de sesión (login.html)
+        window.location.href = "../LoginAdm/login.html";
+        window.history.replaceState({}, document.title, "../LoginAdm/login.html");
+    }
+
+    // Función para eliminar la cookie
+    function eliminarCookie(nombre) {
+        // Establecer el tiempo de expiración de la cookie en el pasado para eliminarla
+        document.cookie = nombre + '=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+
+
+        </script>
+    </main>
+
+    <footer>
+        <button type="submit" class="Addplanta"><a href="addplanta.html"><i class='bx bxs-file-plus'></i></a></button>
+        <button type="submit" class="editar disabled" id="editarPlanta"><a href="#" class="disabled"><i
+                    class='bx bxs-pencil'></i></a></button>
+        <button type="submit" class="eliminar" id="eliminarPlanta"><i class='bx bx-trash'></i></button>
+	<button type="submit" class="mapa"><a href="../Mapa"><i class='bx bx-map-alt'></i></a></button>
+
+    </footer>
+</body>
+
+</html>

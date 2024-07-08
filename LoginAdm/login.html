@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Iniciar sesión</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+    <style>
+        /* Estilos para la alerta personalizada */
+        .alerta-personalizada {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #127dff;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 3px;
+            box-shadow: 0px 0px 5px 0px #ccc;
+            z-index: 999;
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <form action="login.php" method="post">
+            <h1>Inicio</h1>
+            <!-- Contenedor del mensaje de error -->
+            <div id="error-message"></div>
+            <div class="inputbox">
+                <ion-icon name="mail-outline"></ion-icon>
+                <input type="email" id="email" name="email" required>
+                <label class="user" for="email">Correo Electrónico:</label>
+            </div>
+            <div class="inputbox">
+                <ion-icon name="lock-closed-outline"></ion-icon>
+                <input type="password" id="dni" name="dni" required>
+                <label class="pass" for="dni">Contraseña:</label>
+            </div>
+            <button type="submit">Iniciar sesión</button>
+        </form>
+        <script>
+            // Función para obtener el mensaje de error de la URL
+            function getErrorMessage() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const error_message = urlParams.get("error_message");
+                return error_message;
+            }
+
+            // Función para mostrar el mensaje de error en una alerta personalizada
+            function mostrarAlerta(mensaje) {
+                var alerta = document.createElement("div");
+                alerta.className = "alerta-personalizada";
+                alerta.textContent = mensaje;
+                document.body.appendChild(alerta);
+                setTimeout(function () {
+                    document.body.removeChild(alerta);
+                }, 3000); // La alerta se eliminará después de 3 segundos (ajusta este valor según tus necesidades)
+            }
+
+            // Función para mostrar el mensaje de error y borrarlo después de 3 segundos
+            function displayErrorMessage() {
+                const errorMessage = getErrorMessage();
+                if (errorMessage) {
+                    mostrarAlerta(errorMessage);
+                }
+            }
+
+            // Llama a la función para mostrar el mensaje de error
+            displayErrorMessage();
+        </script>
+<script>
+   function verificarCredenciales() {
+    // Supongamos que tienes dos tipos de usuarios: administrador y investigador
+    // Aquí puedes obtener el nombre de usuario y la contraseña ingresados por el usuario
+    var nombreUsuario = document.getElementById('email').value;
+    var contrasena = document.getElementById('dni').value;
+
+    // Supongamos que tienes una función que verifica las credenciales en tu servidor
+    // Esta función podría devolver el tipo de usuario si las credenciales son válidas
+
+    // Por ejemplo, supongamos que la función devuelve el tipo de usuario como 'admin' o 'investigador'
+    var tipoUsuario = verificarCredencialesEnServidor(nombreUsuario, contrasena);
+
+    if (tipoUsuario === 'admin') {
+        // Si el tipo de usuario es 'admin', almacenar la información de inicio de sesión en el almacenamiento local
+        localStorage.setItem('usuarioLogueado', 'admin');
+        // Redirigir al usuario a la página de administrador
+        window.location.href = 'Admin.html';
+    } else if (tipoUsuario === 'investigador') {
+        // Si el tipo de usuario es 'investigador', almacenar la información de inicio de sesión en el almacenamiento local
+        localStorage.setItem('usuarioLogueado', 'investigador');
+        // Redirigir al usuario a la página de investigador
+        window.location.href = 'investigador.html';
+    } else {
+        // Si las credenciales son inválidas, mostrar un mensaje de error al usuario
+        alert('Credenciales inválidas. Por favor, inténtalo de nuevo.');
+    }
+}
+
+function verificarCredencialesEnServidor(email, dni) {
+    var url = 'verificar_credenciales.php'; // URL del script PHP en el servidor
+
+    // Objeto de opciones para la solicitud fetch
+    var opciones = {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: email, dni: dni })
+    };
+
+    // Realizar la solicitud fetch al servidor
+    return fetch(url, opciones)
+        .then(function(response) {
+            if (!response.ok) {
+                throw new Error('Error al realizar la solicitud al servidor: ' + response.status);
+            }
+            return response.json(); // Devolver los datos de la respuesta en formato JSON
+        })
+        .then(function(data) {
+            return data.tipoUsuario; // Devolver el tipo de usuario recibido del servidor
+        })
+        .catch(function(error) {
+            console.error('Error al procesar la solicitud:', error);
+            return 'error'; // Devolver 'error' en caso de error
+        });
+}
+
+</script>
+
+
+    </section>
+</body>
+
+</html>
+

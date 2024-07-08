@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/boxicons/2.0.7/css/boxicons.min.css">
+<link rel="stylesheet" href="../static/styles.css" />
+<title>Formulario de Plantas</title>
+
+<script src="verificar_sesion.js"></script>
+
+<script>
+
+function cerrarSesion() {
+                // Aquí puedes agregar el código para cerrar la sesión, como redirigir a la página de inicio de sesión
+                window.location.href = "../LoginAdm/login.html"; // Cambia "cerrar_sesion.php" por la URL de tu script de cierre de sesión
+
+                // Reemplazar la entrada actual en el historial con la página de inicio de sesión
+                window.history.replaceState({}, document.title, "../LoginAdm/login.html");
+            }
+
+
+  function confirmarinsertar() {
+    // Mostrar un cuadro de diálogo de confirmación al usuario
+    var confirmacion = confirm("¿Estás seguro de insertar esta planta?");
+
+    // Si el usuario confirma, devuelve true y se envía el formulario
+    // Si el usuario cancela, devuelve false y el envío del formulario se cancela
+    return confirmacion;
+  }
+
+  // Asignar la función confirmarEdicion() al evento submit del formulario
+  window.onload = function() {
+    var insertForm = document.getElementById('insertForm');
+    if (insertForm) {
+      insertForm.onsubmit = function() {
+        console.log("Evento submit del formulario activado");
+        return confirmarinsertar();
+      };
+    }
+  };
+
+
+  window.onload = function() {
+    var descripciones = document.querySelectorAll('textarea.limited');
+    
+    descripciones.forEach(function(textarea) {
+      var contador = document.createElement('span');
+      contador.textContent = '0';
+      textarea.parentNode.insertBefore(contador, textarea.nextSibling);
+
+      textarea.addEventListener('input', function() {
+        if (textarea.value.length > 500) {
+          textarea.value = textarea.value.substring(0, 500);
+        }
+        contador.textContent = textarea.value.length;
+      });
+    });
+  };
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleccionar todos los elementos con la clase 'limitedcin'
+    var elementos = document.querySelectorAll('.limitedcin');
+
+    // Iterar sobre cada elemento y aplicar la limitación de caracteres
+    elementos.forEach(function(elemento) {
+        elemento.addEventListener('input', function() {
+            // Limitar el texto a 50 caracteres
+            if (this.value.length > 50) {
+                this.value = this.value.substring(0, 50);
+            }
+        });
+    });
+});
+
+function validarASCII(input) {
+    var regex = /^[ -~áéíóúÁÉÍÓÚüÜ,.ñÑ]*$/;
+    if (!regex.test(input.value)) {
+        input.value = input.value.replace(/[^\x20-\x7EáéíóúÁÉÍÓÚüÜ,.ñÑ'"\s]/g, '');
+    }
+}
+
+
+
+
+</script>
+
+
+</head>
+<body class="addp">
+
+  <header class="barra-sup"> 
+    <a href="Admin.html" id="Titulo" class="Titulo">EcoMapeoBotánico</a>
+    <button type="button" class="back"><a class="regre" href="Admin.html"><i class='bx bx-arrow-back'></i></a></button>
+    <button type="button" class="cerrar-sesion" onclick="cerrarSesion()"><i class='bx bx-log-out'></i></button>
+</header>
+
+  <h1 class="tit-form">Formulario de Plantas</h1>
+  <form class="formulario" action="addplanta.php" method="POST" enctype="multipart/form-data">
+    <label class="nombre" for="nombre">Nombre:</label><br>   
+    <input  oninput="validarASCII(this)" type="text" id="nombre" name="nombre" class="limitedcin" required><br><br>
+
+    <label for="nombre_cientifico">Nombre Científico:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="nombre_cientifico" name="nombre_cientifico" class="limitedcin" required><br><br>
+
+    <label for="reino">Reino:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="reino" name="reino" class="limitedcin" required><br><br>
+
+    <label for="division">División:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="division" name="division" class="limitedcin" required><br><br>
+
+    <label for="SubDivision">Subdivisión:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="SubDivision" name="SubDivision" class="limitedcin" required><br><br>
+
+    <label for="clase">Clase:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="clase" name="clase" class="limitedcin" required><br><br>
+
+    <label for="SubClase">Subclase:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="SubClase" name="SubClase" class="limitedcin" required><br><br>
+
+    <label for="orden">Orden:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="orden" name="orden" class="limitedcin" required><br><br>
+
+    <label for="familia">Familia:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="familia" name="familia" class="limitedcin" required><br><br>
+
+    <label for="genero">Género:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="genero" name="genero" class="limitedcin" required><br><br>
+
+    <label for="especie">Especie:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="especie" name="especie" class="limitedcin" required><br><br>
+
+    <label for="ciudad">Ciudad:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="ciudad" name="ciudad" class="limitedcin" required><br><br>
+
+    <label for="direccion">Dirección:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="direccion" name="direccion" class="limitedcin" required><br><br>
+
+    <label for="zona_reserva">Nombre de la Zona de Reserva:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="zona_reserva" name="zona_reserva" class="limitedcin" required><br><br>
+
+    <label for="ubicacion">Ubicación:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="ubicacion" name="ubicacion" class="limitedcin" required><br><br>
+
+    <label for="jardin_botanico">Nombre del Jardín Botánico:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="jardin_botanico" name="jardin_botanico" class="limitedcin" required><br><br>
+
+    <label for="superficie_decimal">Superficie Decimal:</label><br>
+    <input oninput="validarASCII(this)" type="number" id="superficie_decimal" name="superficie_decimal" class="limitedcin" required><br><br>
+
+    <label for="inicio_flora">Inicio de la Flora:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="inicio_flora" name="inicio_flora" class="limitedcin" required><br><br>
+
+    <label for="fin_flora">Fin de la Flora:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="fin_flora" name="fin_flora" class="limitedcin" required><br><br>
+
+    <label for="tipo_cuidado">Tipo de Cuidado:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="tipo_cuidado" name="tipo_cuidado" class="limitedcin" required><br><br>
+
+<div class="sugerencia-container">
+      <label for="informacion">Recomendaciones de cuidado: <div class="sugerencia-btn">?</div></label><br>
+      <div class="sugerencia">Evitar usar caracteres especiales</div>
+    </div>
+    <textarea oninput="validarASCII(this)" rows="4" cols="50" id="informacion" name="informacion" class="limited" required></textarea><br><br>
+
+    <h2 class="subt-form">Plagas</h2>
+
+    <label for="tipo_plaga">Tipo de Plaga:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="tipo_plaga" name="tipo_plaga" class="limitedcin" ><br><br>
+
+    <div class="sugerencia-container">
+	<label for="descripcion_plaga">Descripción de la Plaga: <div class="sugerencia-btn">?</div></label><br>
+      <div class="sugerencia">Evitar usar caracteres especiales</div>
+    </div>
+    <textarea oninput="validarASCII(this)" rows="4" cols="50" id="descripcion_plaga" name="descripcion_plaga" class="limited"></textarea><br><br>
+
+    <h2 class="subt-form">Información Climática</h2>
+
+    <label for="ciudad_clima">Ciudad:</label><br>
+    <input oninput="validarASCII(this)" type="text" id="ciudad_clima" name="ciudad_clima" class="limitedcin" required><br><br>
+
+   
+    <div class="sugerencia-container">
+      <label for="descripcion_clima">Descripción del Clima:<div class="sugerencia-btn">?</div></label><br>
+      <div class="sugerencia">Evitar usar caracteres especiales</div>
+    </div>
+    <textarea oninput="validarASCII(this)" rows="4" cols="50" id="descripcion_clima" name="descripcion_clima" class="limited" required></textarea><br><br>
+
+    <label for="temperatura_promedio">Temperatura Promedio:</label><br>
+    <input oninput="validarASCII(this)" type="number" id="temperatura_promedio" name="temperatura_promedio" class="limitedcin" required><br><br>
+
+    <label for="humedad_promedio">Humedad Promedio:</label><br>
+    <input oninput="validarASCII(this)" type="number" id="humedad_promedio" name="humedad_promedio" class="limitedcin" required><br><br>
+
+   
+    <div class="sugerencia-container">
+     <label for="descripcion_suelo">Descripción del Suelo: <div class="sugerencia-btn">?</div> </label><br>
+      <div class="sugerencia">Evitar usar caracteres especiales</div>
+    </div>
+    <textarea oninput="validarASCII(this)" rows="4" cols="50" id="descripcion_suelo" name="descripcion_suelo" class="limited" required></textarea><br><br>
+
+    <label for="latitud">Latitud:</label><br>
+    <input oninput="validarASCII(this)" type="number" id="latitud" name="latitud" class="limitedcin" required><br><br>
+
+    <label for="longitud">Longitud:</label><br>
+    <input oninput="validarASCII(this)" type="number" id="longitud" name="longitud" class="limitedcin" required><br><br>
+
+    <div class="sugerencia-container">
+	<label for="imagen">Subir Imagen:<div class="sugerencia-btn">?</div></label><br>
+      <div class="sugerencia">Sugerencia de tipo imagen: jpg</div>
+    </div>
+    <input type="file" id="imagen" name="imagen" accept="image/*"><br><br>
+
+    <button class="enviar" type="submit" value="Enviar" onclick="return confirmarinsertar();"  >Enviar</button>
+    </form>
+    
+</body>
+
+</html>
+
+
+
